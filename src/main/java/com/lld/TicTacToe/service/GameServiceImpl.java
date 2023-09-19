@@ -7,10 +7,12 @@ import java.util.Scanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.lld.TicTacToe.bots.OpenAIAPIService;
 import com.lld.TicTacToe.model.Board;
 import com.lld.TicTacToe.model.BotDifficultyLevel;
 import com.lld.TicTacToe.model.BotPlayer;
 import com.lld.TicTacToe.model.Cell;
+import com.lld.TicTacToe.model.CellStatus;
 import com.lld.TicTacToe.model.Game;
 import com.lld.TicTacToe.model.GameState;
 import com.lld.TicTacToe.model.Move;
@@ -35,6 +37,7 @@ public class GameServiceImpl implements GameService {
 	Scanner sc = new Scanner(System.in);
 
 	public void intiateGame() {
+
 		System.out.println("Lets begin Tic Tac Toe ....");
 		System.out.println();
 
@@ -48,15 +51,14 @@ public class GameServiceImpl implements GameService {
 
 		System.out.println("Enter the symbol for First player");
 		char symbol = sc.next().charAt(0);
-
 		Player p1 = new Player(name, PlayerType.HUMAN, symbol);
 
-		System.out.println("Is there a bot? y/n");
+		System.out.println("Is there a bot? Y/N");
 
 		char isBot = sc.next().charAt(0);
 		Player p2 = null;
-		if (isBot == 'y') {
-			p2 = new BotPlayer(BotDifficultyLevel.EASY);
+		if (isBot == 'Y') {
+			p2 = new BotPlayer("Chat Gpt", BotDifficultyLevel.MEDIUM, 'O');
 		} else {
 			System.out.println("Enter the name for Second player");
 
@@ -79,7 +81,6 @@ public class GameServiceImpl implements GameService {
 		loop: while (true) {
 
 			printBoard(board);
-
 			Player nextPlayer = game.getCurrentPlayer();
 
 			PlayerService playerService = playerServiceFactory.getPlayingService(nextPlayer.getPlayerType());
@@ -118,24 +119,19 @@ public class GameServiceImpl implements GameService {
 	}
 
 	private void printBoard(Board board) {
-		List<List<Cell>> cells = board.getCellsList();
-
-		for (List<Cell> rows : cells) {
-
-			for (Cell cell : rows) {
-
-				System.out.print("|");
-
-				if (cell.getPlayer() == null)
-					System.out.print(" ");
-				else
-					System.out.print(cell.getPlayer().getSymbol());
-
-				System.out.print("|");
+		for (int i = 0; i < board.getCellsList().size(); i++) {
+			for (int j = 0; j < board.getCellsList().size(); j++) {
+				if (board.getCellsList().get(board.getCellsList().size() - i - 1).get(j).getCellStatus()
+						.equals(CellStatus.EMPTY)) {
+					System.out.print("|   |");
+				} else {
+					System.out.printf("| %s |", board.getCellsList().get(board.getCellsList().size() - i - 1).get(j)
+							.getPlayer().getSymbol());
+				}
 			}
-
 			System.out.println();
 		}
+
 	}
 
 	public Board initiateBoard(int rowNum, int colNum) {

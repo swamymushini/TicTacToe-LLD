@@ -17,9 +17,9 @@ public abstract class PlayerService {
 	public Move makeMove(Game game) {
 
 		Player player = game.getCurrentPlayer();
-		
+
 		Cell cell = createMove(game);
-		if (cell.getCellStatus().equals(CellStatus.OCCUPIED)) {
+		if (cell == null || cell.getCellStatus().equals(CellStatus.OCCUPIED)) {
 			System.out.println("Current cell is occupied");
 			return null;
 		}
